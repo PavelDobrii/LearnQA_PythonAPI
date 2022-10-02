@@ -2,7 +2,7 @@ import pytest
 import requests
 
 from lib.base_case import BaseCase
-
+from lib.assertions import Assertions
 
 class TestUserAuth(BaseCase):
 
@@ -28,12 +28,12 @@ class TestUserAuth(BaseCase):
             cookies={'auth_sid':  self.auth_sid},
             )
 
-        assert 'user_id' in response2.json(), 'Error. user_id is not in json'
-
-        user_id_from_method = response2.json()['user_id']
-
-        assert user_id_from_method ==  self.user_id, 'Error. user_id_from_method != user_id'
-
+        Assertions.assert_json_value_name(
+            response2,
+            'user_id',
+            self.user_id_from_auth_method,
+            'Error. user_id_from_method != user_id'
+        )
 
     exclude_params = [
         ('no_cookie'),
@@ -52,8 +52,10 @@ class TestUserAuth(BaseCase):
                 url2,
                 cookies={'auth_sid':  self.auth_sid},
             )
-        assert 'user_id' in response2.json(), 'Error. user_id is not in json'
 
-        user_id_from_method = response2.json()['user_id']
-
-        assert user_id_from_method == 0, 'Error. User is authorisation'
+        Assertions.assert_json_value_name(
+            response2,
+            'user_id',
+            0,
+            'Error. User is authorisation'
+        )
